@@ -1,0 +1,24 @@
+pre-commit:
+  commands: {}
+
+pre-push:
+  commands:
+    lint:
+      runner: bun
+      glob: "*.{js,ts,tsx,json,md}"
+      command: "bun lint"
+    format:
+      runner: bun
+      glob: "*.{js,ts,tsx,json,md}"
+      command: "bun format"
+
+post-checkout:
+  commands:
+    lint:
+      runner: bun
+      glob: "*.{js,ts,tsx,json,md}"
+      command: "bun lint"
+    format:
+      runner: bun
+      glob: "*.{js,ts,tsx,json,md}"
+      command: "bun format"

@@ -1,0 +1,24 @@
+{
+  "name": "todo_app",
+  "scripts": {
+    "dev": "NODE_ENV=local bun run --hot src/index.ts",
+    "format": "bun biome format",
+    "format:write": "bun biome format --write",
+    "lint": "bun biome lint"
+  },
+  "dependencies": {
+    "@hono/swagger-ui": "^0.4.1",
+    "@hono/zod-openapi": "^0.18.3",
+    "hono": "^4.6.15",
+    "nanoid": "^5.0.9"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/bun": "latest",
+    "lefthook": "^1.10.1"
+  },
+  "packageManager": "bun@1.1.42",
+  "volta": {
+    "node": "20.18.1"
+  }
+}
