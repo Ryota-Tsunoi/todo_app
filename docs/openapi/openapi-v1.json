@@ -1,1 +1,212 @@
-{}
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "0.0.1",
+    "title": "V1 Todo API"
+  },
+  "components": {
+    "schemas": {
+      "ListUsersResponse": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "John Doe"
+                }
+              },
+              "required": ["id", "name"]
+            }
+          }
+        },
+        "required": ["users"]
+      },
+      "FetchUserResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "123e4567-e89b-12d3-a456-426614174000"
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe"
+              }
+            },
+            "required": ["id", "name"]
+          }
+        },
+        "required": ["user"]
+      },
+      "UpdateUserResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "123e4567-e89b-12d3-a456-426614174000"
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe"
+              }
+            },
+            "required": ["id", "name"]
+          }
+        },
+        "required": ["user"]
+      },
+      "UpdateUserRequestBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "example": "John Doe"
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/api/v1": {
+      "get": {
+        "summary": "v1 root route",
+        "description": "v1 root router return Hello Hono",
+        "tags": ["Root"],
+        "responses": {
+          "200": {
+            "description": "v1 root router return Hello Hono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "example": "1.0.0"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Hello Hono!"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "This is the V1 API for the Hono server."
+                    },
+                    "uptime": {
+                      "type": "number",
+                      "example": 100
+                    }
+                  },
+                  "required": ["version", "message", "description", "uptime"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "summary": "v1 list users route",
+        "description": "v1 list users router return users",
+        "tags": ["Users"],
+        "responses": {
+          "200": {
+            "description": "v1 list users router return users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListUsersResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "summary": "v1 fetch user route",
+        "description": "v1 fetch user router return user",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "123e4567-e89b-12d3-a456-426614174000"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "v1 fetch user router return user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchUserResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "123e4567-e89b-12d3-a456-426614174000"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "description": "The user to update",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
