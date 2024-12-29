@@ -11,6 +11,10 @@ pre-push:
       runner: bun
       glob: "*.{js,ts,tsx,json,md}"
       command: "bun format"
+    test:
+      runner: bun
+      glob: "*.{js,ts,tsx,json,md}"
+      command: "bun test --coverage --coverageReporters=text"
 
 post-checkout:
   commands:
@@ -22,3 +26,7 @@ post-checkout:
       runner: bun
       glob: "*.{js,ts,tsx,json,md}"
       command: "bun format"
+    test:
+      runner: bun
+      glob: "*.{js,ts,tsx,json,md}"
+      command: "bun test --coverage --coverageReporters=text"

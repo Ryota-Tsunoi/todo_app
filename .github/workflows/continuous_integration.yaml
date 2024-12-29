@@ -2,136 +2,39 @@ name: Continuous Integration
 
 on:
   push:
-    branches:
-      - main
-      - staging
-      - develop
-    paths-ignore:
-      - "docs/**"
-
+    branches: [main]
   pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
-    paths-ignore:
-      - "docs/**"
+    branches: [main]
 
 jobs:
-  setup:
-    if: github.event.pull_request.draft == false
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
     steps:
-      - name: Checkout by push
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+      - uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node_modules_cache_id
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/bun.lockb') }}
-
       - name: Install dependencies
-        if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
         run: bun install
+
+      - name: Run tests with coverage
+        run: bun test --coverage --coverageReporters=text
 
   lint:
     runs-on: ubuntu-latest
-    needs: setup
-
     steps:
-      - name: Checkout by push
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+      - uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node_modules_cache_id
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/bun.lockb') }}
-
       - name: Install dependencies
-        if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
         run: bun install
 
-      - name: Lint
+      - name: Run lint
         run: bun lint
-
-  test:
-    runs-on: ubuntu-latest
-    needs: setup
-
-    steps:
-      - name: Checkout by push
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node_modules_cache_id
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/bun.lockb') }}
-
-      - name: Install dependencies
-        if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
-        run: bun install
-
-      - name: Test
-        run: bun test
-
-  actions-timeline:
-    runs-on: ubuntu-latest
-    needs: [setup, lint, test]
-    permissions:
-      actions: read
-
-    steps:
-      - uses: Kesin11/actions-timeline@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}

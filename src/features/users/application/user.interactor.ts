@@ -12,7 +12,6 @@ import {
   UserUpdateError,
 } from "../domain/error/domain-error";
 import { UserRepository } from "../domain/repository/user.repository";
-import { UserId } from "../domain/value-object/user-id";
 import { UserName } from "../domain/value-object/user-name";
 import { UserMapper } from "../infrastructure/mapper/user.mapper";
 
@@ -26,8 +25,57 @@ export class UserInteractor {
   ) {}
 
   /**
-   * エラーを適切なHTTP例外に変換します
-   * @param error 発生したエラー
+   * ユーザー一覧を取得
+   */
+  async fetchListUsers(): Promise<User[]> {
+    try {
+      const users = await this.userRepository.getMany();
+      return users.map((user) => this.mapper.toEntity(user));
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  /**
+   * 指定されたIDのユーザーを取得
+   */
+  async fetchUser(id: string): Promise<User> {
+    try {
+      const user = await this.userRepository.getOne(id);
+      return this.mapper.toEntity(user);
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  /**
+   * ユーザー情報を更新
+   */
+  async updateUser(id: string, name: string): Promise<User> {
+    try {
+      // 新しい名前でUserNameを作成（バリデーション）
+      const userName = new UserName(name);
+
+      // 現在のユーザーを取得
+      const currentUser = await this.userRepository.getOne(id);
+      const userEntity = this.mapper.toEntity(currentUser);
+
+      // 名前を更新した新しいエンティティを作成
+      const updatedEntity = userEntity.changeName(userName);
+
+      // リポジトリで更新を実行
+      const updatedDto = await this.userRepository.update(
+        this.mapper.toDto(updatedEntity),
+      );
+
+      return this.mapper.toEntity(updatedDto);
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  /**
+   * エラーを適切なHTTP例外に変換
    */
   private handleError(error: unknown): never {
     if (error instanceof UserNotFoundError) {
@@ -58,42 +106,5 @@ export class UserInteractor {
       ErrorCode.INTERNAL_ERROR,
       error instanceof Error ? [error] : undefined,
     );
-  }
-
-  async fetchListUsers(): Promise<User[]> {
-    try {
-      const users = await this.userRepository.getMany();
-      return users.map((user) => this.mapper.toEntity(user));
-    } catch (error: unknown) {
-      this.handleError(error);
-    }
-  }
-
-  async fetchUser(id: string): Promise<User> {
-    try {
-      const userId = new UserId(id);
-      const user = await this.userRepository.getOne(userId.value);
-      return this.mapper.toEntity(user);
-    } catch (error: unknown) {
-      this.handleError(error);
-    }
-  }
-
-  async updateUser(id: string, name: string): Promise<User> {
-    try {
-      const userId = new UserId(id);
-      const userName = new UserName(name);
-
-      const userDto = await this.userRepository.getOne(userId.value);
-      const user = this.mapper.toEntity(userDto);
-      const updatedUser = user.changeName(userName);
-
-      const updatedUserDto = this.mapper.toDto(updatedUser);
-      const savedDto = await this.userRepository.update(updatedUserDto);
-
-      return this.mapper.toEntity(savedDto);
-    } catch (error: unknown) {
-      this.handleError(error);
-    }
   }
 }
