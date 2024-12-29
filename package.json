@@ -18,8 +18,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/bun": "latest",
-    "lefthook": "^1.10.1",
-    "vitest-mock": "^0.0.0"
+    "lefthook": "^1.10.1"
   },
   "packageManager": "bun@1.1.42",
   "volta": {
